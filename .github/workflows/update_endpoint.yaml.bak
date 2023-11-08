@@ -38,4 +38,3 @@ jobs:
             git add $MIRROR_FILE
             git commit -m "Updating mirror"
             git push
-          fi
