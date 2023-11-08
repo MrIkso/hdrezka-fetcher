@@ -4,7 +4,9 @@ on:
   schedule:
     - cron:  '0 */6 * * *'
   workflow_dispatch:
-
+env:
+  MIRROR: ""
+  
 jobs:
   update:
     name: Update MIRROR
@@ -22,6 +24,7 @@ jobs:
 
       - name: Run python script
         run: |
+          set -e
           python main.py ${{ secrets.SENDER_EMAIL }} "${{ secrets.SENDER_PASSWORD }}"
           echo "Mirror -> $MIRROR"
           echo "MIRROR=$MIRROR" >> $GITHUB_ENV
