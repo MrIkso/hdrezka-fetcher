@@ -26,8 +26,8 @@ jobs:
         run: |
           set -e
           python main.py ${{ secrets.SENDER_EMAIL }} "${{ secrets.SENDER_PASSWORD }}"
-          echo "Mirror -> $MIRROR"
-          echo "MIRROR=$MIRROR" >> $GITHUB_ENV
+          # echo "Mirror -> $MIRROR"
+         # echo "MIRROR=$MIRROR" >> $GITHUB_ENV
       
       - name: Update mirror if it differs
         run: |
