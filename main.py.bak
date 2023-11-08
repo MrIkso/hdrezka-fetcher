@@ -5,7 +5,7 @@ import re
 import smtplib
 import sys
 import time
-import os
+
 
 def main():
     """Main function"""
