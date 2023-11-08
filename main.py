@@ -94,7 +94,10 @@ def send_email(sender_email, sender_password):
                 found_text = match.group(1)
                 newText = "https://" + found_text
                 print("Mirror: ", newText)
-                os.environ["MIRROR"] = newText
+                env_file = os.getenv('GITHUB_ENV')
+
+                with open(env_file, "a") as myfile:
+                    myfile.write("MIRROR=" + newText)
                 #file = open("mirror.txt", "w")
                 #file.write(newText.strip())
                 #file.close()
