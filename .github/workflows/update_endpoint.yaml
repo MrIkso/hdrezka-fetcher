@@ -2,7 +2,7 @@ name: Update mirror
 
 on:
   schedule:
-    - cron:  '0 */12 * * *'
+    - cron:  '*/20 * * * *'
   workflow_dispatch:
 env:
   MIRROR: ""
