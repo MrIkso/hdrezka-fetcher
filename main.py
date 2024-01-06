@@ -23,14 +23,40 @@ def main():
         print("Arguments not found")
         sys.exit(0)
 
-
+def get_email_body(received_email):
+    text_body = ""
+    text_encoding = None
+    html_body = ""
+    html_encoding = None
+    if received_email.is_multipart():
+        for payload in received_email.get_payload():
+            # If the message comes with a signature it can be that this
+            # payload itself has multiple parts, so just return the
+            # first one
+            if payload.is_multipart():
+                text_body, text_encoding, html_body, html_encoding = get_email_body(payload)
+            else:
+                body = payload.get_payload(decode=True)
+                encoding = payload.get_content_charset()
+                if payload.get_content_type() == "text/plain":
+                    text_body = body
+                    text_encoding = encoding
+                elif payload.get_content_type() == "text/html":
+                    html_body = body
+                    html_encoding = encoding
+    else:
+        text_body = received_email.get_payload(decode=True)
+        text_encoding = received_email.get_content_charset()
+        html_body = None
+    return text_body, text_encoding, html_body, html_encoding
+    
 def send_email(sender_email, sender_password):
     """Send and read an email"""
 
     # https://www.systoolsgroup.com/imap/
     gmail_host = "imap.gmail.com"
 
-    pattern = r"Текущий адрес персонального зеркала:\s+(.+)"
+    pattern = r'<a\s+[^>]*href="([^"]*)"[^>]*>'
 
     print("Sending mail...")
     sender_mail = smtplib.SMTP("smtp.gmail.com", 587)
@@ -82,33 +108,26 @@ def send_email(sender_email, sender_password):
     # print("To:", email_message["to"])
     print("From: ", email_message["from"])
     print("Date: ", email_message["date"])
-    for part in email_message.walk():
-        if (
-            part.get_content_type() == "text/plain"
-            or part.get_content_type() == "text/html"
-        ):
-            message = part.get_payload(decode=True)
-            # print("Message: \n", message.decode())
-            match = re.search(pattern, message.decode())
-            if match:
-                found_text = match.group(1)
-                newText = "https://" + found_text
-                print("Mirror: ", newText)
-                env_file = os.getenv('GITHUB_ENV')
-
-                with open(env_file, "a") as myfile:
-                    myfile.write("MIRROR=" + newText.strip())
-                #file = open("mirror.txt", "w")
-                #file.write(newText.strip())
-                #file.close()
-            else:
-                print("text not match!")
-
-            print("==========================================\n")
-            break
-
+    text_body, text_encoding, html_body, html_encoding = get_email_body(email_message)
+    normal_html_body = html_body.decode(email_message.get_content_charset() or "utf-8")
+    #print("Message: \n", normal_html_body)
+    
+    match = re.search(pattern, normal_html_body)
+    if match:
+        mirror = match.group(1).strip()[:-1]
+        print("Mirror: ", mirror)
+        env_file = os.getenv('GITHUB_ENV')
+        with open(env_file, "a") as myfile:
+          myfile.write("MIRROR=" + mirror)
+        file = open("mirror.txt", "w")
+        file.write(mirror)
+        file.close()
+    else:
+        print("text not match!")
+            
+    print("==========================================\n")
+        
     mail.close()
     mail.logout()
-
 
 main()
