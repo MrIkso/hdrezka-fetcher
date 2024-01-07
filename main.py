@@ -119,9 +119,9 @@ def send_email(sender_email, sender_password):
         env_file = os.getenv('GITHUB_ENV')
         with open(env_file, "a") as myfile:
           myfile.write("MIRROR=" + mirror)
-        file = open("mirror.txt", "w")
-        file.write(mirror)
-        file.close()
+        #file = open("mirror.txt", "w")
+        #file.write(mirror)
+        #file.close()
     else:
         print("text not match!")
             
