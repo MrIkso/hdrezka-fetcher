@@ -61,10 +61,15 @@ def check_and_upgrade_url(url):
             save_miror(url)
             
 def check_mirror(url):
-    request_response = requests.head(url)
-    status_code = request_response.status_code
-    website_is_up = status_code == 200
-    return website_is_up
+    try:
+        response = requests.get(url, timeout=1000)
+        if response.ok:   # alternatively you can use response.status_code == 200
+          print("Success - API is accessible.")
+          return True
+        else:
+            print(f"Failure - API is accessible but sth is not right. Response codde : {response.status_code}")
+    except requests.exceptions.HTTPError as err:
+        raise SystemExit(err)
 
 def save_miror(url):
     env_file = os.getenv('GITHUB_ENV')
