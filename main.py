@@ -70,11 +70,13 @@ def check_and_upgrade_url(url):
 
 def save_miror(url):
     env_file = os.getenv('GITHUB_ENV')
-        with open(env_file, "a") as myfile:
-          myfile.write("MIRROR=" + mirror)
-        file = open("mirror.txt", "w")
-        file.write(mirror)
-        file.close()
+    env_file = open(env_file, "a")
+    env_file.write("MIRROR=" + mirror)
+    env_file.close()
+    
+    file = open("mirror.txt", "w")
+    file.write(mirror)
+    file.close()
 
 def send_email(sender_email, sender_password):
     """Send and read an email"""
