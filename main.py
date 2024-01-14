@@ -147,7 +147,7 @@ def send_email(sender_email, sender_password):
     if match:
         mirror = match.group(1).strip()[:-1]
         print("Mirror: ", mirror)
-        check_and_upgrade_url(mirror)
+        save_miror(mirror)
     else:
         print("text not match!")
             
