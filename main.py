@@ -2,6 +2,7 @@
 import email
 import imaplib
 import re
+import requests
 import smtplib
 import sys
 import time
@@ -50,6 +51,31 @@ def get_email_body(received_email):
         html_body = None
     return text_body, text_encoding, html_body, html_encoding
     
+def check_and_upgrade_url(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        print("URL доступен:", url)
+        save_miror(url)
+    except requests.RequestException:
+        # Если не удалось получить доступ по HTTP, попробуем с HTTPS
+        url = "https://" + url.split("://")[1]
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            print("URL доступен (после добавления https):", url)
+            save_miror(url)
+        except requests.RequestException:
+            print("URL недоступен и с использованием https:", url)
+
+def save_miror(url):
+    env_file = os.getenv('GITHUB_ENV')
+        with open(env_file, "a") as myfile:
+          myfile.write("MIRROR=" + mirror)
+        file = open("mirror.txt", "w")
+        file.write(mirror)
+        file.close()
+
 def send_email(sender_email, sender_password):
     """Send and read an email"""
 
@@ -116,12 +142,7 @@ def send_email(sender_email, sender_password):
     if match:
         mirror = match.group(1).strip()[:-1]
         print("Mirror: ", mirror)
-        env_file = os.getenv('GITHUB_ENV')
-        with open(env_file, "a") as myfile:
-          myfile.write("MIRROR=" + mirror)
-        #file = open("mirror.txt", "w")
-        #file.write(mirror)
-        #file.close()
+        check_and_upgrade_url(mirror)
     else:
         print("text not match!")
             
