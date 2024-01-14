@@ -54,7 +54,7 @@ def get_email_body(received_email):
 def check_and_upgrade_url(url):
     if check_mirror(url):
         save_miror(url)
-    else
+    else:
         url = "https://" + url.split("://")[1]
         if check_mirror(url):
             print("URL доступен (после добавления https):", url)
