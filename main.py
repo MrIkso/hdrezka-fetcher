@@ -66,7 +66,6 @@ def check_mirror(url):
     website_is_up = status_code == 200
     return website_is_up
 
-print(website_is_up)
 def save_miror(url):
     env_file = os.getenv('GITHUB_ENV')
     env_file = open(env_file, "a")
