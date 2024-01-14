@@ -52,22 +52,21 @@ def get_email_body(received_email):
     return text_body, text_encoding, html_body, html_encoding
     
 def check_and_upgrade_url(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        print("URL доступен:", url)
+    if check_mirror(url):
         save_miror(url)
-    except requests.RequestException:
-        # Если не удалось получить доступ по HTTP, попробуем с HTTPS
+    else
         url = "https://" + url.split("://")[1]
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
+        if check_mirror(url):
             print("URL доступен (после добавления https):", url)
             save_miror(url)
-        except requests.RequestException:
-            print("URL недоступен и с использованием https:", url)
+            
+def check_mirror(url):
+    request_response = requests.head(url)
+    status_code = request_response.status_code
+    website_is_up = status_code == 200
+    return website_is_up
 
+print(website_is_up)
 def save_miror(url):
     env_file = os.getenv('GITHUB_ENV')
     env_file = open(env_file, "a")
