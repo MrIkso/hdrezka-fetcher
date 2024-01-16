@@ -53,12 +53,12 @@ def get_email_body(received_email):
     
 def check_and_upgrade_url(url):
     if check_mirror(url):
-        save_miror(url)
+        save_miror(url, False)
     else:
         url = "https://" + url.split("://")[1]
         if check_mirror(url):
-            print("URL доступен (после добавления https):", url)
-            save_miror(url)
+            print("URL available with added htpps: {url}")
+            save_miror(ur, False)
             
 def check_mirror(url):
     try:
@@ -71,15 +71,18 @@ def check_mirror(url):
     except requests.exceptions.HTTPError as err:
         raise SystemExit(err)
 
-def save_miror(url):
-    env_file = os.getenv('GITHUB_ENV')
-    env_file = open(env_file, "a")
-    env_file.write("MIRROR=" + url)
-    env_file.close()
+def save_miror(url, localtest):
+    if localtest:
+        # only for local testing
+        file = open("mirror.txt", "w")
+        file.write(url)
+        file.close()
+    else:
+        env_file = os.getenv('GITHUB_ENV')
+        env_file = open(env_file, "a")
+        env_file.write("MIRROR=" + url)
+        env_file.close()
     
-    file = open("mirror.txt", "w")
-    file.write(url)
-    file.close()
 
 def send_email(sender_email, sender_password):
     """Send and read an email"""
@@ -147,7 +150,7 @@ def send_email(sender_email, sender_password):
     if match:
         mirror = match.group(1).strip()[:-1]
         print("Mirror: ", mirror)
-        save_miror(mirror)
+        save_miror(mirror, False)
     else:
         print("text not match!")
             
