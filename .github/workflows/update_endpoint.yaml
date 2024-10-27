@@ -43,3 +43,9 @@ jobs:
             git commit -m "Updating mirror"
             git push
           fi
+          
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          retain_days: 1
+          keep_minimum_runs: 1
